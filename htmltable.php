@@ -6,42 +6,57 @@ class htmltable
 
    public function __construct()
    {
-    $class1=get_called_class();
-    $this->search(6,$class1);
+	    $calledClass=get_called_class();
+	    $this->fetchRecords(6,$calledClass);
    }
 
-   public function search($count,$class1)
+   public function fetchRecords($count,$tableName)
    {
-    $db=connection::getConnection();
-    $sql = 'SELECT * FROM '.$class1.' where id< :count1';
-    $stmt = $db->prepare($sql);
-    $stmt->bindParam(':count1', $count);
-    $stmt->execute();
-    $rows=$stmt->rowCount();
-    echo 'Row count= '.$rows;
-    echo '<br>';
-    $rowtotal=$stmt->fetchAll();
-    $this->displayTable($rowtotal);
-   }
-    public function displayTable($e)
+//Connect to Database
+	    $db=connection::getConnection();
+	
+//Fetch Data	
+	    $sql = 'SELECT * FROM '.$tableName.' where id < :IDs';
+	    $stmt = $db->prepare($sql);
+	    $stmt->bindParam(':IDs', $count);
+	    $stmt->execute();
+	    $rows=$stmt->rowCount();
+	    echo 'Row count= '.$rows;
+	    echo '<br>';
+	    $rowtotal=$stmt->fetchAll();
+	    
+//Fetch Colu//Fetch Column Names
+	    $table_meta = $db->prepare("DESCRIBE ". $tableName);
+	    $table_meta->execute();
+	    $table_fields = $table_meta->fetchAll(PDO::FETCH_COLUMN);
+
+//Display Records
+            $this->displayRecords($rowtotal, $table_fields);
+    }
+   
+    public function displayRecords($data, $columns)
     {
 
       echo "<table border=3>";
-      echo "<tr><th>id</th><th>email</th><th>fname</th><th>lname</th><th>phone</th><th>birthday</th><th>gender</th><th>password</th></tr>";
-      foreach( $e as $row)
+
+      echo "<tr>";
+
+//Display Column Heading
+      foreach( $columns as $col)
+      {
+        echo "<th>".$col."</th>";
+      }
+      echo "</tr>";
+     
+//Display all the Rows     
+      foreach( $data as $row)
       {
         echo "<tr>";
-        echo "<td>".$row['id']."</td>";
-        echo "<td>".$row['email']."</td>";
-        echo "<td>".$row['fname']."</td>";
-        echo "<td>".$row['lname']."</td>";
-	      echo "<td>".$row['phone']."</td>";
-        echo "<td>".$row['birthday']."</td>";
-        echo "<td>".$row['gender']."</td>";
-        echo "<td>".$row['password']."</td>";
-        echo "</tr>";
+       
+	foreach($columns as $col)
+		echo "<td>".$row[$col]."</td>";
+	echo "</tr>";
       }
-
 
 
    }
