@@ -25,7 +25,7 @@ class htmltable
 	    echo '<br>';
 	    $rowtotal=$stmt->fetchAll();
 	    
-//Fetch Colu//Fetch Column Names
+//Fetch Column Names
 	    $table_meta = $db->prepare("DESCRIBE ". $tableName);
 	    $table_meta->execute();
 	    $table_fields = $table_meta->fetchAll(PDO::FETCH_COLUMN);
